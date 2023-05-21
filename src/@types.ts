@@ -13,6 +13,7 @@ export type Result = {
   price: number;
   condition: string;
   shipping: Shipping;
+  seller_address: SellerAddress;
 };
 
 export type RawItem = {
@@ -24,12 +25,12 @@ export type RawItem = {
   condition: string;
   shipping: Shipping;
   sold_quantity: number;
+  pictures: Picture[];
 };
 
 export type RawDescription = {
   plain_text: string;
-}
-
+};
 
 export type AvailableFilter = {
   id: string;
@@ -46,4 +47,14 @@ export type AvailableFilterValue = {
 
 type Shipping = {
   free_shipping: boolean;
+};
+
+type SellerAddress = {
+  state: {
+    name: string;
+  };
+};
+
+type Picture = {
+  url: string;
 };
