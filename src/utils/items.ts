@@ -1,4 +1,4 @@
-import type { AvailableFilter, RawItem, Result } from "../@types";
+import type { AvailableFilter, Filter, RawItem, Result } from "../@types";
 
 export const parseItems = (items: Result[]) => {
   return items.map((item) => {
@@ -18,12 +18,16 @@ export const parseItems = (items: Result[]) => {
   });
 };
 
-export const parseCategories = (categories?: AvailableFilter) => {
-  return categories?.values
+export const parseCategoriesByAvailableFilters = (availableFilters?: AvailableFilter) => {
+  return availableFilters?.values
     .sort((a, b) => b.results - a.results)
-    .slice(0, 4)
+    .slice(0, 3)
     .map((category) => category.name);
 };
+
+export const parseCategoriesByFilters = (filters?: Filter) => {
+  return filters?.values[0].path_from_root.map((category) => category.name);
+}
 
 export const parseItem = ({
   item,

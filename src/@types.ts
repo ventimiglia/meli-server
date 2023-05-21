@@ -1,5 +1,6 @@
 export type RawItems = {
   results: Result[];
+  filters: Filter[];
   available_filters: AvailableFilter[];
 };
 
@@ -58,3 +59,17 @@ type SellerAddress = {
 type Picture = {
   url: string;
 };
+
+export interface Filter {
+  id: string;
+  name: string;
+  values: FilterValue[];
+}
+
+export interface FilterValue {
+  name: string;
+  path_from_root: {
+    id: null | string;
+    name: string;
+  }[];
+}

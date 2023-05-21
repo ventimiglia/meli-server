@@ -1,11 +1,17 @@
 import type {
   AvailableFilter,
+  Filter,
   RawDescription,
   RawItem,
   RawItems,
 } from "../@types";
 import { AUTHOR } from "../utils/constants";
-import { parseCategories, parseItem, parseItems } from "../utils/items";
+import {
+  parseCategoriesByFilters,
+  parseCategoriesByAvailableFilters,
+  parseItem,
+  parseItems,
+} from "../utils/items";
 import { Request, Response } from "express";
 
 export const getItemsBySearch = async (req: Request, res: Response) => {
@@ -14,18 +20,30 @@ export const getItemsBySearch = async (req: Request, res: Response) => {
       `https://api.mercadolibre.com/sites/MLA/search?q=${req.query.q}&limit=4`
     );
 
-    if(!apiResponse.ok) {
-      res.status(404).send({error: 'Not found'});
+    if (!apiResponse.ok) {
+      res.status(404).send({ error: "Not found" });
       return;
     }
-    
+
     const rawItems: RawItems = await apiResponse.json();
-    const rawCategories = rawItems.available_filters.find(
+
+    const rawCategoriesByFilters = rawItems?.filters?.find(
+      (filter: Filter) => filter.id === "category"
+    );
+
+    const rawCategoriesByAvailableFilters = rawItems?.available_filters?.find(
       (filter: AvailableFilter) => filter.id === "category"
     );
 
+    const formattedCategoriesByFilters = parseCategoriesByFilters(
+      rawCategoriesByFilters
+    );
+    const formattedCategoriesByAvailableFilters =
+      parseCategoriesByAvailableFilters(rawCategoriesByAvailableFilters);
+
+    const formattedCategories = formattedCategoriesByFilters || formattedCategoriesByAvailableFilters;
+
     const formattedItems = parseItems(rawItems.results);
-    const formattedCategories = parseCategories(rawCategories);
 
     const data = {
       author: AUTHOR,
@@ -47,8 +65,8 @@ export const getItemById = async (req: Request, res: Response) => {
       `https://api.mercadolibre.com/items/${req.params.id}/description`
     );
 
-    if(!apiResponse.ok || !apiDescriptionResponse.ok) {      
-      res.status(404).send({error: 'Not found'});
+    if (!apiResponse.ok || !apiDescriptionResponse.ok) {
+      res.status(404).send({ error: "Not found" });
       return;
     }
 
